@@ -59,11 +59,34 @@ export const loginUser = async (req: Request, res: Response) => {
       { expiresIn: "1d" }
     );
 
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,          // true ONLY in HTTPS prod
+      sameSite: "lax",        // required for localhost
+      maxAge: 24 * 60 * 60 * 1000
+    });
+
     res.status(200).json({
       message: "Login successful",
       token
     });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const logoutUser = async (req: Request, res: Response) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: false,        // true in HTTPS prod
+      sameSite: "lax"
+    });
+
+    return res.status(200).json({
+      message: "Logout successful"
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error" });
   }
 };
