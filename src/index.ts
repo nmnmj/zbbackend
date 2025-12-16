@@ -15,14 +15,17 @@ app.use(cookieParser());
 
 // CORS Configuration for Next.js frontend for production
 // Middleware
-const allowedOrigin = process.env.NEXT_PUBLIC_API_URL as string;
+const allowedOrigins = (process.env.NEXT_PUBLIC_API_URL || "")
+  .split(",")
+  .map(origin => origin.trim());
+
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (Postman, curl, server-to-server)
       if (!origin) return callback(null, true);
 
-      if (origin === allowedOrigin) {
+      if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
